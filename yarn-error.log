@@ -1,0 +1,27 @@
+Arguments: 
+  /Users/mou/.nvm/versions/node/v10.18.1/bin/node /usr/local/Cellar/yarn/1.19.2/libexec/bin/yarn.js add react-native --exact
+
+PATH: 
+  /Users/mou/.nvm/versions/node/v10.18.1/bin:/usr/local/bin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/mou/Library/Android/sdk/tools:/Users/mou/Library/Android/sdk/platform-tools:/Users/mou/dev/flutter/bin
+
+Yarn version: 
+  1.19.2
+
+Node version: 
+  10.18.1
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: https://registry.npmjs.org/hermes-engine/-/hermes-engine-0.4.1.tgz: unexpected end of file
+      at Zlib.zlibOnError [as onerror] (zlib.js:164:17)
+
+npm manifest: 
+  {"name":"ugBle","version":"0.0.1","private":true,"scripts":{"start":"node node_modules/react-native/local-cli/cli.js start"}}
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
