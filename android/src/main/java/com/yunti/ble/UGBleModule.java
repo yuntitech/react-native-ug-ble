@@ -149,7 +149,7 @@ public class UGBleModule extends ReactContextBaseJavaModule {
 
     }
 
-    private void connectDevice(BluetoothDevice bluetoothDevice, final Activity activity) {
+    private void connectDevice(final BluetoothDevice bluetoothDevice, final Activity activity) {
         UgBleFactory.getInstance().connect(activity, bluetoothDevice, new IBleUsbDataReturnInterface() {
             @Override
             public void onGetBleUsbDataReturn(final byte bleButton, final int bleX, final int bleY, final short blePressure) {
@@ -189,10 +189,12 @@ public class UGBleModule extends ReactContextBaseJavaModule {
                 if (iBleUsbDataReturnInterface != null) {
                     iBleUsbDataReturnInterface.onGetBleUsbConnectType(type);
                 }
-                
+
                 if (reactContext != null) {
                     WritableMap event = Arguments.createMap();
                     event.putInt("type", type);
+                    event.putString("address", bluetoothDevice.getAddress());
+                    event.putString("name", bluetoothDevice.getName());
                     reactContext
                             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                             .emit(connectDeviceTypeNotification, event);
