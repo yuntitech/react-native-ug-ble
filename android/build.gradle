@@ -63,6 +63,6 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.facebook.react:react-native:+'
-    implementation 'com.ugee:pentabletinterfacelibrary:1.0'
-    implementation 'com.ugee:blesupport:1.0'
+    api 'com.ugee:pentabletinterfacelibrary:1.1'
+    api 'com.ugee:blesupport:1.1'
 }
