@@ -6,7 +6,15 @@ const {
   Platform,
 } = require("react-native");
 const { UGBleModule } = NativeModules;
-
+/**
+ * 扫描设备的通知
+ */
+export const scanBluetoothDeviceNotification =
+  "scanBluetoothDeviceNotification";
+/**
+ * 连接设备状态的通知
+ */
+export const connectDeviceTypeNotification = "connectDeviceTypeNotification";
 export const isBluetoothOpen = async (): Promise<boolean> => {
   return UGBleModule.isBluetoothOpen();
 };
