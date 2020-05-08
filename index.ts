@@ -7,11 +7,11 @@ const {
 } = require("react-native");
 const { UGBleModule } = NativeModules;
 
-export const isBluetoothOpen = async () => {
+export const isBluetoothOpen = async (): Promise<boolean> => {
   return UGBleModule.isBluetoothOpen();
 };
 
-export const isConnDevice = async (address) => {
+export const isConnDevice = async (address): Promise<boolean> => {
   return UGBleModule.isConnDevice(address);
 };
 
