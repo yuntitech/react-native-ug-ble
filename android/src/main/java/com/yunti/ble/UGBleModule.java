@@ -94,19 +94,13 @@ public class UGBleModule extends ReactContextBaseJavaModule {
         UgBleFactory.getInstance().startScanAndTime(activity, new IUgeeBleInterface() {
             @Override
             public void onGetBleDevice(BluetoothDevice bluetoothDevice, int i, byte[] bytes) {
-                for (int index = 0; index < deviceList.size(); index++) {
-                    if(!deviceList.get(index).getAddress().equals(bluetoothDevice.getAddress())){
-                        deviceList.add(bluetoothDevice);
-                        deviceList.add(bluetoothDevice);
-                        WritableMap event = Arguments.createMap();
-                        event.putString("address", bluetoothDevice.getAddress());
-                        event.putString("name", bluetoothDevice.getName());
-                        reactContext
-                                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                                .emit(scanBluetoothDeviceNotification, event);
-                    }
-
-                }
+                deviceList.add(bluetoothDevice);
+                WritableMap event = Arguments.createMap();
+                event.putString("address", bluetoothDevice.getAddress());
+                event.putString("name", bluetoothDevice.getName());
+                reactContext
+                        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                        .emit(scanBluetoothDeviceNotification, event);
             }
 
             @Override
