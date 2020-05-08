@@ -1,7 +1,25 @@
 package com.yunti.ble;
 
+import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
+import android.text.TextUtils;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.ble.support.UgBleFactory;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.ugee.pentabletinterfacelibrary.IBleUsbDataReturnInterface;
+import com.ugee.pentabletinterfacelibrary.IUgeeBleInterface;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * @version V1.0 <描述当前版本功能>
