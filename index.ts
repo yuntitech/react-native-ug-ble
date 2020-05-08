@@ -23,6 +23,6 @@ export const startScanAndTime = (scanTime) => {
   UGBleModule.startScanAndTime(scanTime);
 };
 
-export const connectDevice = (address) => {
-  UGBleModule.connectDevice(address);
+export const connectDevice = async (address): Promise<number> => {
+  return UGBleModule.connectDevice(address);
 };
