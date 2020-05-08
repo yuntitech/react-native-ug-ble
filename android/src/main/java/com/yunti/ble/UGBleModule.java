@@ -29,8 +29,14 @@ import java.util.List;
 public class UGBleModule extends ReactContextBaseJavaModule {
 
     private ReactApplicationContext reactContext;
-
+    /**
+     * 扫描设备的通知
+     */
     private String scanBluetoothDeviceNotification = "scanBluetoothDeviceNotification";
+    /**
+     * 连接设备的通知
+     */
+    private String connectDeviceTypeNotification = "connectDeviceTypeNotification";
     private List<BluetoothDevice> deviceList = new ArrayList();
     private static final int CONNECT_DEVICE_TYPE_SUCCESS = 0;//连接成功
     private static final int CONNECT_DEVICE_TYPE_ONFAIL = 1;//连接失败
@@ -99,12 +105,15 @@ public class UGBleModule extends ReactContextBaseJavaModule {
             @Override
             public void onGetBleDevice(BluetoothDevice bluetoothDevice, int i, byte[] bytes) {
                 deviceList.add(bluetoothDevice);
-                WritableMap event = Arguments.createMap();
-                event.putString("address", bluetoothDevice.getAddress());
-                event.putString("name", bluetoothDevice.getName());
-                reactContext
-                        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                        .emit(scanBluetoothDeviceNotification, event);
+                if (reactContext != null) {
+                    WritableMap event = Arguments.createMap();
+                    event.putString("address", bluetoothDevice.getAddress());
+                    event.putString("name", bluetoothDevice.getName());
+                    reactContext
+                            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                            .emit(scanBluetoothDeviceNotification, event);
+                }
+
             }
 
             @Override
@@ -126,7 +135,7 @@ public class UGBleModule extends ReactContextBaseJavaModule {
      * @param address
      */
     @ReactMethod
-    public void connectDevice(String address,Promise promise) {
+    public void connectDevice(String address) {
         Activity activity = getCurrentActivity();
         if (deviceList == null || activity == null) {
             return;
@@ -134,13 +143,13 @@ public class UGBleModule extends ReactContextBaseJavaModule {
         for (int i = 0; i < deviceList.size(); i++) {
             BluetoothDevice bluetoothDevice = deviceList.get(i);
             if (bluetoothDevice.getAddress().equals(address)) {
-                connectDevice(bluetoothDevice, activity,promise);
+                connectDevice(bluetoothDevice, activity);
             }
         }
 
     }
 
-    private void connectDevice(BluetoothDevice bluetoothDevice, final Activity activity, final Promise promise) {
+    private void connectDevice(BluetoothDevice bluetoothDevice, final Activity activity) {
         UgBleFactory.getInstance().connect(activity, bluetoothDevice, new IBleUsbDataReturnInterface() {
             @Override
             public void onGetBleUsbDataReturn(final byte bleButton, final int bleX, final int bleY, final short blePressure) {
@@ -180,7 +189,15 @@ public class UGBleModule extends ReactContextBaseJavaModule {
                 if (iBleUsbDataReturnInterface != null) {
                     iBleUsbDataReturnInterface.onGetBleUsbConnectType(type);
                 }
-                promise.resolve(type);
+                
+                if (reactContext != null) {
+                    WritableMap event = Arguments.createMap();
+                    event.putInt("type", type);
+                    reactContext
+                            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                            .emit(connectDeviceTypeNotification, event);
+                }
+
 //                activity.runOnUiThread(new Runnable() {
 //                    @Override
 //                    public void run() {
@@ -224,6 +241,7 @@ public class UGBleModule extends ReactContextBaseJavaModule {
 
     /**
      * 设置 连接的数据回调
+     *
      * @param l
      */
     public void addIBleUsbDataReturnInterface(IBleUsbDataReturnInterface l) {
