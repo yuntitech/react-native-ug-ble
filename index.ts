@@ -57,3 +57,10 @@ export const startScanAndTime = (scanTime) => {
 export const connectDevice = async (address) => {
   UGBleModule.connectDevice(address);
 };
+
+/**
+ * 打开蓝牙
+ */
+export const openBle = () => {
+  UGBleModule.openBle();
+};
