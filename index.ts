@@ -33,7 +33,7 @@ export const isBluetoothOpen = async (): Promise<boolean> => {
 /**
  * 设备是否连接
  */
-export const isConnDevice = async (address): Promise<boolean> => {
+export const isConnDevice = async (address: string): Promise<boolean> => {
   return UGBleModule.isConnDevice(address);
 };
 
@@ -47,14 +47,14 @@ export const disConnectDevice = () => {
 /**
  * 扫描设备
  */
-export const startScanAndTime = (scanTime) => {
+export const startScanAndTime = (scanTime: number) => {
   UGBleModule.startScanAndTime(scanTime);
 };
 
 /**
  * 连接设备并接收数据
  */
-export const connectDevice = async (address) => {
+export const connectDevice = async (address: string) => {
   UGBleModule.connectDevice(address);
 };
 
