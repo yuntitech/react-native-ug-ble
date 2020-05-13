@@ -12,6 +12,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.ugee.pentabletinterfacelibrary.IBleUsbDataReturnInterface;
 import com.ugee.pentabletinterfacelibrary.IUgeeBleInterface;
@@ -26,8 +27,10 @@ import java.util.List;
  * @date: 05-14:43
  * @desc
  */
+@ReactModule(name = UGBleModule.NAME)
 public class UGBleModule extends ReactContextBaseJavaModule {
 
+    static final String NAME = "UGBleModule";
     private ReactApplicationContext reactContext;
     /**
      * 扫描设备的通知
@@ -53,7 +56,7 @@ public class UGBleModule extends ReactContextBaseJavaModule {
 
     @Override
     public String getName() {
-        return "UGBleModule";
+        return NAME;
     }
 
     /**
