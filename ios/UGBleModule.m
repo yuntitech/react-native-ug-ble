@@ -94,6 +94,16 @@ RCT_EXPORT_METHOD(disConnectDevice) {
     }
 }
 
+RCT_EXPORT_METHOD(openBle) {
+    NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        NSDictionary *options = @{ UIApplicationOpenURLOptionUniversalLinksOnly: @(NO) };
+        [[UIApplication sharedApplication] openURL:url
+                                           options:options
+                                 completionHandler:^(BOOL success) { }];
+    }
+}
+
 ///**
 // * 扫描设备
 // */
