@@ -16,6 +16,8 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.ugee.pentabletinterfacelibrary.IBleUsbDataReturnInterface;
 import com.ugee.pentabletinterfacelibrary.IUgeeBleInterface;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -254,5 +256,19 @@ public class UGBleModule extends ReactContextBaseJavaModule {
     public void addIBleUsbDataReturnInterface(IBleUsbDataReturnInterface l) {
         this.iBleUsbDataReturnInterface = l;
 
+    }
+
+    @ReactMethod
+    public void openBle() {
+        Activity activity = getCurrentActivity();
+        if(activity==null){
+            return;
+        }
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            activity.startActivity(enableBtIntent);
+
+        }
     }
 }
