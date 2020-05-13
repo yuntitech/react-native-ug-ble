@@ -72,11 +72,13 @@ public class UGBleModule extends ReactContextBaseJavaModule {
      * @param promise
      */
     @ReactMethod
-    public void isConnDevice(Promise promise, String address) {
-        if (TextUtils.isEmpty(address)) {
+    public void isConnDevice(String address, Promise promise) {
+        Activity activity = getCurrentActivity();
+        if (TextUtils.isEmpty(address) || activity == null) {
             promise.resolve(false);
         } else {
-            promise.resolve(UgBleFactory.getInstance().isConnDevice(reactContext, address));
+            boolean isConnected = UgBleFactory.getInstance().isConnDevice(activity, address);
+            promise.resolve(isConnected);
         }
 
     }
