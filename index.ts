@@ -51,6 +51,12 @@ export const startScanAndTime = (scanTime: number) => {
   UGBleModule.startScanAndTime(scanTime);
 };
 
+export const stopScan = async () => {
+  if (Platform.OS ==='ios') {
+    return UGBleModule.stopScan()
+  }
+}
+
 /**
  * 连接设备并接收数据
  */
