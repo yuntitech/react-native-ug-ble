@@ -52,6 +52,7 @@ RCT_EXPORT_MODULE();
         _cbCentralManager = [[CBCentralManager alloc] init];
         _cbCentralManager.delegate = self;
         _connectedDevices = [NSMutableDictionary dictionary];
+        _scannedDevices = [NSMutableDictionary dictionary];
         [[BluetoothShareManager shareManager] setManageDelegate:self];
     }
     return self;
@@ -213,6 +214,7 @@ RCT_EXPORT_METHOD(connectDevice:(nonnull NSString *)address
         @"address": peripheral.identifier.UUIDString,
         @"name": peripheral.name
     };
+    [self.scannedDevices setValue:peripheral forKey:peripheral.identifier.UUIDString];
     [self sendEventWithName:UGScanBluetoothDeviceNotification body:body];
 }
 
