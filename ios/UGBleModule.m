@@ -72,7 +72,7 @@ RCT_EXPORT_METHOD(isBluetoothOpen:(RCTPromiseResolveBlock)resolve
 // * 设备是否连接
 // */
 //export const isConnDevice = async (address): Promise<boolean> => {
-RCT_EXPORT_METHOD(isConnDevice:(NSString *)address
+RCT_EXPORT_METHOD(isConnDevice:(nonnull NSString *)address
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
     CBPeripheral *device = [self.connectedDevices valueForKey:address];
@@ -108,7 +108,7 @@ RCT_EXPORT_METHOD(openBle) {
 // * 扫描设备
 // */
 //export const startScanAndTime = (scanTime) => {
-RCT_EXPORT_METHOD(startScanAndTime:(NSNumber *)scanTime
+RCT_EXPORT_METHOD(startScanAndTime:(nonnull NSNumber *)scanTime
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
     // iOS并没有用到这个时间，Android才会用到
@@ -126,7 +126,7 @@ RCT_EXPORT_METHOD(stopScan:(RCTPromiseResolveBlock)resolve
 // * 连接设备并接收数据
 // */
 //export const connectDevice = async (address) => {
-RCT_EXPORT_METHOD(connectDevice:(NSString *)address
+RCT_EXPORT_METHOD(connectDevice:(nonnull NSString *)address
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
     CBPeripheral *peripheral = [self.scannedDevices valueForKey:address];
