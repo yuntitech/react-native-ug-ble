@@ -2,3 +2,4 @@
 ios/UgBle.xcodeproj/xcuserdata
 node_modules/.bin/react-native
 yarn-error.log
+android/build
