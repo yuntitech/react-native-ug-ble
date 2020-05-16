@@ -158,24 +158,27 @@ RCT_EXPORT_METHOD(connectDevice:(nonnull NSString *)address
  @param peripheral 连接成功对象
  */
 - (void)BlueToothDidConnectPeripheral:(CBPeripheral *)peripheral {
-    [self.connectedDevices setValue:peripheral
-                             forKey:peripheral.identifier.UUIDString];
+    if (peripheral) {
+        [self.connectedDevices setValue:peripheral
+                                 forKey:peripheral.identifier.UUIDString];
 
-    UGConnectionStatus status = UGConnectionStatusSuccess;
-    NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
-    [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+        UGConnectionStatus status = UGConnectionStatusSuccess;
+        NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
+        [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+    }
 }
 
 /**
  断开设备连接
  */
 - (void)BlueToothDidDisconnectPeripheral:(CBPeripheral*) peripheral {
-    [self.connectedDevices setValue:nil
-                             forKey:peripheral.identifier.UUIDString];
+    if (peripheral) {
+        [self.connectedDevices setValue:nil forKey:peripheral.identifier.UUIDString];
 
-    UGConnectionStatus status = UGConnectionStatusDisconnected;
-    NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
-    [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+        UGConnectionStatus status = UGConnectionStatusDisconnected;
+        NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
+        [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+    }
 }
 
 /**
@@ -183,12 +186,14 @@ RCT_EXPORT_METHOD(connectDevice:(nonnull NSString *)address
  */
 - (void)BlueToothDidFailToConnectPeripheral:(CBPeripheral *)peripheral
                                       error:(NSError *)error {
-    [self.connectedDevices setValue:nil
-                             forKey:peripheral.identifier.UUIDString];
+    if (peripheral) {
+        [self.connectedDevices setValue:nil
+                                 forKey:peripheral.identifier.UUIDString];
 
-    UGConnectionStatus status = UGConnectionStatusFailure;
-    NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
-    [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+        UGConnectionStatus status = UGConnectionStatusFailure;
+        NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
+        [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+    }
 }
 
 /**
@@ -196,12 +201,14 @@ RCT_EXPORT_METHOD(connectDevice:(nonnull NSString *)address
  */
 - (void)BlueToothDidTimeoutConnectPeripheral:(CBPeripheral *)peripheral
                                        error:(NSError *)error {
-    [self.connectedDevices setValue:nil
-                             forKey:peripheral.identifier.UUIDString];
+    if (peripheral) {
+        [self.connectedDevices setValue:nil
+                                 forKey:peripheral.identifier.UUIDString];
 
-    UGConnectionStatus status = UGConnectionStatusFailure;
-    NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
-    [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+        UGConnectionStatus status = UGConnectionStatusFailure;
+        NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
+        [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+    }
 }
 
 /**
@@ -210,12 +217,14 @@ RCT_EXPORT_METHOD(connectDevice:(nonnull NSString *)address
  @param peripheral 扫描到的外设对象
  */
 - (void)ScanBlueToothDevicePeripheral:(CBPeripheral*)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData {
-    NSDictionary *body = @{
-        @"address": peripheral.identifier.UUIDString,
-        @"name": peripheral.name
-    };
-    [self.scannedDevices setValue:peripheral forKey:peripheral.identifier.UUIDString];
-    [self sendEventWithName:UGScanBluetoothDeviceNotification body:body];
+    if (peripheral) {
+        NSDictionary *body = @{
+            @"address": peripheral.identifier.UUIDString,
+            @"name": peripheral.name
+        };
+        [self.scannedDevices setValue:peripheral forKey:peripheral.identifier.UUIDString];
+        [self sendEventWithName:UGScanBluetoothDeviceNotification body:body];
+    }
 }
 
 /**
