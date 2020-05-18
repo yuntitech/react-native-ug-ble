@@ -139,6 +139,27 @@ RCT_EXPORT_METHOD(connectDevice:(nonnull NSString *)address
     }
 }
 
+RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+    NSInteger maxX = 0;
+    NSInteger maxY = 0;
+    NSInteger maxPressure = 0;
+    
+    BLE_TABLET_DEVICEINFO deviceInfo;
+    [[BluetoothShareManager shareManager] bleGetDeviceInfo:&deviceInfo];
+    if (deviceInfo.axisX.max != 0) {
+        maxX = deviceInfo.axisX.max;
+        maxY = deviceInfo.axisY.max;
+        maxPressure = deviceInfo.pressure;
+    }
+    NSDictionary *info = @{
+        @"maxX": @(maxX),
+        @"maxY": @(maxY),
+        @"maxPressure": @(maxPressure)
+    };
+    resolve(info);
+}
+
 - (NSDictionary *)connectNotificationBodyWithPeripheral:(CBPeripheral *)peripheral
                                        connectionStatus:(UGConnectionStatus)status {
     NSDictionary *body = @{

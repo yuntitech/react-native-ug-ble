@@ -1,6 +1,7 @@
 import { NativeModules, Platform } from 'react-native';
 
 const { UGBleModule } = NativeModules;
+
 /**
  * 扫描设备的通知
  */
@@ -37,6 +38,13 @@ export enum ConnectStatusType {
    */
   CONNECT_DEVICE_TYPE_BLUETOOTH_CLOSE = 5,
 }
+
+export interface UGBleDeviceInfo {
+  maxX: number;
+  maxY: number;
+  maxPressure: number;
+}
+
 /**
  * 蓝牙是否打开
  */
@@ -83,4 +91,8 @@ export const connectDevice = async (address: string) => {
  */
 export const openBle = () => {
   UGBleModule.openBle();
+};
+
+export const getDeviceInfo = async (): Promise<UGBleDeviceInfo> => {
+  return UGBleModule.getDeviceInfo();
 };
