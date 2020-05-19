@@ -40,6 +40,16 @@ typedef NS_ENUM(NSInteger, UGConnectionStatus) {
 @property (nonatomic) BOOL isBluetoothOn;
 @property (nonatomic) NSMutableDictionary<NSString *, CBPeripheral *> *connectedDevices;
 @property (nonatomic) NSMutableDictionary<NSString *, CBPeripheral *> *scannedDevices;
+@property (nonatomic, nullable) NSDictionary *dataToSend;
+@property (nonatomic) NSTimeInterval fireInterval;
+@property (nonatomic) NSTimeInterval idleInterval;
+@property (nonatomic, nullable, weak) NSTimer *sendDataTimer;
+
+@property (nonatomic) NSTimeInterval lastCheckIdleTime;
+@property (nonatomic) NSTimeInterval firstSkipTime;
+
+@property (nonatomic, nullable, copy) NSDictionary *deviceInfo;
+
 @end
 
 @implementation UGBleModule
@@ -49,6 +59,8 @@ RCT_EXPORT_MODULE();
 - (instancetype)init {
     self = [super init];
     if (self) {
+        _fireInterval = 0.03;
+        _idleInterval = 5;
         _cbCentralManager = [[CBCentralManager alloc] init];
         _cbCentralManager.delegate = self;
         _connectedDevices = [NSMutableDictionary dictionary];
@@ -58,8 +70,50 @@ RCT_EXPORT_MODULE();
     return self;
 }
 
+- (void)dealloc {
+    [self stopTimer];
+}
+
 - (NSArray<NSString *> *)supportedEvents {
     return @[UGConnectDeviceTypeNotification, UGScanBluetoothDeviceNotification];
+}
+
+- (void)startTimerIfNeeded {
+    if (_sendDataTimer == nil) {
+        _sendDataTimer = [NSTimer scheduledTimerWithTimeInterval:_fireInterval
+                                                          target:self
+                                                        selector:@selector(sendReceivedData)
+                                                        userInfo:nil
+                                                         repeats:YES];
+    }
+}
+
+- (void)stopTimer {
+    [_sendDataTimer invalidate];
+    _sendDataTimer = nil;
+}
+
+- (void)sendReceivedData {
+    if (self.dataToSend) {
+        NSLog(@"dataToSend: %@", self.dataToSend.description);
+        NSString *notificationName = @"UGBleDidReceiveDataPacketNotification";
+        [[NSNotificationCenter defaultCenter] postNotificationName:notificationName
+                                                            object:self.dataToSend];
+        self.dataToSend = nil;
+        self.firstSkipTime = 0;
+    } else {
+        NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+        if (self.firstSkipTime == 0) {
+            self.firstSkipTime = now;
+        }
+        
+        BOOL idleForAWhile = now - self.firstSkipTime > self.idleInterval;
+        if (idleForAWhile) {
+            [self stopTimer];
+        }
+        
+        NSLog(@"dataToSend skipped");
+    }
 }
 
 
@@ -141,23 +195,26 @@ RCT_EXPORT_METHOD(connectDevice:(nonnull NSString *)address
 
 RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
-    NSInteger maxX = 0;
-    NSInteger maxY = 0;
-    NSInteger maxPressure = 0;
-    
+    NSDictionary *info = [self nativeGetDeviceInfo];
+    resolve(info);
+}
+
+- (nullable NSDictionary *)nativeGetDeviceInfo {
     BLE_TABLET_DEVICEINFO deviceInfo;
     [[BluetoothShareManager shareManager] bleGetDeviceInfo:&deviceInfo];
     if (deviceInfo.axisX.max != 0) {
-        maxX = deviceInfo.axisX.max;
-        maxY = deviceInfo.axisY.max;
-        maxPressure = deviceInfo.pressure;
+        NSInteger maxX = deviceInfo.axisX.max;
+        NSInteger maxY = deviceInfo.axisY.max;
+        NSInteger maxPressure = deviceInfo.pressure;
+        NSDictionary *info = @{
+            @"maxX": @(maxX),
+            @"maxY": @(maxY),
+            @"maxPressure": @(maxPressure)
+        };
+        return info;
     }
-    NSDictionary *info = @{
-        @"maxX": @(maxX),
-        @"maxY": @(maxY),
-        @"maxPressure": @(maxPressure)
-    };
-    resolve(info);
+    
+    return nil;
 }
 
 - (NSDictionary *)connectNotificationBodyWithPeripheral:(CBPeripheral *)peripheral
@@ -170,6 +227,27 @@ RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
     return body;
 }
 
+- (NSDictionary *)createDataToSend:(BLE_DATAPACKET *)dataPacket {
+    NSInteger penStatus = dataPacket->penstatus;
+    
+    CGFloat x = dataPacket->x;
+    CGFloat y = dataPacket->y;
+    NSMutableDictionary *data = [NSMutableDictionary dictionaryWithCapacity:10];
+    [data setValue:@(x) forKey:@"x"];
+    [data setValue:@(y) forKey:@"y"];
+    [data setValue:@(dataPacket->pressure) forKey:@"pressure"];
+    [data setValue:@(dataPacket->eventtype) forKey:@"eventType"];
+    [data setValue:@(dataPacket->physical_key) forKey:@"physicalKey"];
+    [data setValue:@(dataPacket->virtual_key) forKey:@"virtualKey"];
+    [data setValue:@(dataPacket->keystatus) forKey:@"keyStatus"];
+    [data setValue:@(penStatus) forKey:@"penStatus"];
+    
+    if (self.deviceInfo) {
+        [data addEntriesFromDictionary:self.deviceInfo];
+    }
+    
+    return data.copy;
+}
 
 #pragma mark - BluetoothShareManagerDelegate
 
@@ -255,7 +333,50 @@ RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
  @param dataPacket 模拟鼠标数据接收包
  */
 - (void)manager:(BluetoothShareManager *)manager didReceviceDataPacket:(BLE_DATAPACKET *)dataPacket {
-    // TODO:
+    if (self.deviceInfo == nil) {
+        self.deviceInfo = [self nativeGetDeviceInfo];
+    }
+    
+    if (self.deviceInfo == nil) {
+        return;
+    }
+    
+    NSInteger penStatus = dataPacket->penstatus;
+    switch (penStatus) {
+        case BLE_PenStatus_Down: {
+            [self startTimerIfNeeded];
+            
+            self.dataToSend = [self createDataToSend:dataPacket];
+            
+            // 立即发送
+            [self sendReceivedData];
+            break;
+        }
+        case BLE_PenStatus_Up:
+        case BLE_PenStatus_Hover: {
+            self.dataToSend = [self createDataToSend:dataPacket];
+            
+            // 立即发送
+            [self sendReceivedData];
+            break;
+        }
+        case BLE_PenStatus_Move: {
+            // 画的过程中省略一些事件
+            self.dataToSend = [self createDataToSend:dataPacket];
+            break;
+        }
+        case BLE_PenStatus_Leave: {
+            self.dataToSend = [self createDataToSend:dataPacket];
+            
+            // 立即发送
+            [self sendReceivedData];
+            
+            [self stopTimer];
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 

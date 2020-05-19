@@ -1,7 +1,6 @@
 import { NativeModules, Platform } from 'react-native';
 
 const { UGBleModule } = NativeModules;
-
 /**
  * 扫描设备的通知
  */
