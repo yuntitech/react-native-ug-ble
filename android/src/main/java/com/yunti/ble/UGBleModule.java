@@ -267,6 +267,7 @@ public class UGBleModule extends ReactContextBaseJavaModule {
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            enableBtIntent.putExtra(Intent.EXTRA_PACKAGE_NAME, "cn.bookln.saas.hhtk");
             activity.startActivity(enableBtIntent);
 
         }
