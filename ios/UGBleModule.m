@@ -9,7 +9,9 @@
 @import CoreBluetooth;
 #import "UGBleModule.h"
 
-#ifndef TARGET_OS_SIMULATOR
+#define BKL_UG_BLE_DEBUG DEBUG
+
+#ifndef BKL_UG_BLE_DEBUG
 #import "BluetoothShareManager.h"
 #endif
 
@@ -42,7 +44,7 @@ typedef NS_ENUM(NSInteger, UGConnectionStatus) {
 @interface UGBleModule ()
 <
 CBCentralManagerDelegate
-#ifndef TARGET_OS_SIMULATOR
+#ifndef BKL_UG_BLE_DEBUG
 , BluetoothShareManagerDelegate
 #endif
 >
@@ -76,7 +78,7 @@ RCT_EXPORT_MODULE();
         _connectedDevices = [NSMutableDictionary dictionary];
         _scannedDevices = [NSMutableDictionary dictionary];
         
-        #ifndef TARGET_OS_SIMULATOR
+        #ifndef BKL_UG_BLE_DEBUG
         [[BluetoothShareManager shareManager] setManageDelegate:self];
         #endif
     }
@@ -158,7 +160,7 @@ RCT_EXPORT_METHOD(isConnDevice:(nonnull NSString *)address
 RCT_EXPORT_METHOD(disConnectDevice) {
     for (NSString *identifier in self.connectedDevices.copy) {
         CBPeripheral *device = [self.connectedDevices valueForKey:identifier];
-        #ifndef TARGET_OS_SIMULATOR
+        #ifndef BKL_UG_BLE_DEBUG
         [[BluetoothShareManager shareManager] CancelDisconnectBlueToothDevice:device];
         #endif
     }
@@ -181,7 +183,7 @@ RCT_EXPORT_METHOD(openBle) {
 RCT_EXPORT_METHOD(startScanAndTime:(nonnull NSNumber *)scanTime
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
-    #ifndef TARGET_OS_SIMULATOR
+    #ifndef BKL_UG_BLE_DEBUG
     // iOS并没有用到这个时间，Android才会用到
     [[BluetoothShareManager shareManager] ScanBlueToothDevice];
     #endif
@@ -191,7 +193,7 @@ RCT_EXPORT_METHOD(startScanAndTime:(nonnull NSNumber *)scanTime
 
 RCT_EXPORT_METHOD(stopScan:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
-    #ifndef TARGET_OS_SIMULATOR
+    #ifndef BKL_UG_BLE_DEBUG
     [[BluetoothShareManager shareManager] StopScanBleDevice];
     #endif
     
@@ -207,7 +209,7 @@ RCT_EXPORT_METHOD(connectDevice:(nonnull NSString *)address
                   reject:(RCTPromiseRejectBlock)reject) {
     CBPeripheral *peripheral = [self.scannedDevices valueForKey:address];
     if (peripheral) {
-        #ifndef TARGET_OS_SIMULATOR
+        #ifndef BKL_UG_BLE_DEBUG
         [[BluetoothShareManager shareManager] ConnectBlueToothDevicePeripheral:peripheral];
         #endif
         
@@ -224,7 +226,7 @@ RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
 }
 
 - (nullable NSDictionary *)nativeGetDeviceInfo {
-    #ifndef TARGET_OS_SIMULATOR
+    #ifndef BKL_UG_BLE_DEBUG
     BLE_TABLET_DEVICEINFO deviceInfo;
     [[BluetoothShareManager shareManager] bleGetDeviceInfo:&deviceInfo];
     if (deviceInfo.axisX.max != 0) {
@@ -253,7 +255,7 @@ RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
     return body;
 }
 
-#ifndef TARGET_OS_SIMULATOR
+#ifndef BKL_UG_BLE_DEBUG
 - (NSDictionary *)createDataToSend:(BLE_DATAPACKET *)dataPacket {
     NSInteger penStatus = dataPacket->penstatus;
     
@@ -354,7 +356,7 @@ RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
     }
 }
 
-#ifndef TARGET_OS_SIMULATOR
+#ifndef BKL_UG_BLE_DEBUG
 
 /**
  //模拟鼠标接收包
