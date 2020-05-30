@@ -16,6 +16,7 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.ugee.pentabletinterfacelibrary.IBleUsbDataReturnInterface;
 import com.ugee.pentabletinterfacelibrary.IUgeeBleInterface;
+
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 
@@ -50,6 +51,8 @@ public class UGBleModule extends ReactContextBaseJavaModule {
     private static final int CONNECT_DEVICE_TYPE_BLUETOOTH_CLOSE = 5;//蓝牙未打开
 
     public IBleUsbDataReturnInterface iBleUsbDataReturnInterface;
+    private int mBleUsbMaxX = 1;
+    private int mBleUsbMaxY = 1;
 
     public UGBleModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -59,6 +62,14 @@ public class UGBleModule extends ReactContextBaseJavaModule {
     @Override
     public String getName() {
         return NAME;
+    }
+
+    public int getBleUsbMaxX() {
+        return mBleUsbMaxX;
+    }
+
+    public int getBleUsbMaxY() {
+        return mBleUsbMaxY;
     }
 
     /**
@@ -186,6 +197,8 @@ public class UGBleModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onGetBleUsbScreenMax(int rc, int maxX, int maxY, int maxButton, int maxPressure) {
+                UGBleModule.this.mBleUsbMaxX = maxX;
+                UGBleModule.this.mBleUsbMaxY = maxY;
                 if (iBleUsbDataReturnInterface != null) {
                     iBleUsbDataReturnInterface.onGetBleUsbScreenMax(rc, maxX, maxY, maxButton, maxPressure);
                 }
@@ -261,7 +274,7 @@ public class UGBleModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void openBle() {
         Activity activity = getCurrentActivity();
-        if(activity==null){
+        if (activity == null) {
             return;
         }
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
