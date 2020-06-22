@@ -9,8 +9,8 @@
 @import CoreBluetooth;
 #import "UGBleModule.h"
 
-// 需要真机调试的时候把这里改为YES
-#define BKL_UG_BLE_DEBUG NO
+// 需要真机调试的时候把这里改为1
+#define BKL_UG_BLE_DEBUG 0
 
 #define BKL_UG_BLE_ENABLED BKL_UG_BLE_DEBUG || !DEBUG
 
@@ -26,6 +26,10 @@ NSString *const UGScanBluetoothDeviceNotification = @"scanBluetoothDeviceNotific
 /// 连接设备状态的通知
 /// { type: number, address: string, name: string }
 NSString *const UGConnectDeviceTypeNotification = @"connectDeviceTypeNotification";
+
+/// 连接设备状态的通知，给原生代码用的，NSNotificationCenter发送
+/// { type: number, address: string, name: string }
+NSString *const UGBleConnectionDidChangeNotification = @"cn.bookln.UGBleConnectionDidChangeNotification";
 
 typedef NS_ENUM(NSInteger, UGConnectionStatus) {
     /// 连接成功
@@ -110,7 +114,6 @@ RCT_EXPORT_MODULE();
 
 - (void)sendReceivedData {
     if (self.dataToSend) {
-        NSLog(@"dataToSend: %@", self.dataToSend.description);
         NSString *notificationName = @"UGBleDidReceiveDataPacketNotification";
         [[NSNotificationCenter defaultCenter] postNotificationName:notificationName
                                                             object:self.dataToSend];
@@ -126,8 +129,6 @@ RCT_EXPORT_MODULE();
         if (idleForAWhile) {
             [self stopTimer];
         }
-        
-        NSLog(@"dataToSend skipped");
     }
 }
 
@@ -303,6 +304,11 @@ RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
 }
 #endif
 
+- (void)sendConnectionDidChangeNotification:(NSDictionary *)body {
+    [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+    [[NSNotificationCenter defaultCenter] postNotificationName:UGBleConnectionDidChangeNotification object:body];
+}
+
 #pragma mark - BluetoothShareManagerDelegate
 
 /**
@@ -317,7 +323,7 @@ RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
 
         UGConnectionStatus status = UGConnectionStatusSuccess;
         NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
-        [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+        [self sendConnectionDidChangeNotification:body];
     }
 }
 
@@ -330,7 +336,7 @@ RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
 
         UGConnectionStatus status = UGConnectionStatusDisconnected;
         NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
-        [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+        [self sendConnectionDidChangeNotification:body];
     }
 }
 
@@ -345,7 +351,7 @@ RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
 
         UGConnectionStatus status = UGConnectionStatusFailure;
         NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
-        [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+        [self sendConnectionDidChangeNotification:body];
     }
 }
 
@@ -360,7 +366,7 @@ RCT_EXPORT_METHOD(getDeviceInfo:(RCTPromiseResolveBlock)resolve
 
         UGConnectionStatus status = UGConnectionStatusFailure;
         NSDictionary *body = [self connectNotificationBodyWithPeripheral:peripheral connectionStatus:status];
-        [self sendEventWithName:UGConnectDeviceTypeNotification body:body];
+        [self sendConnectionDidChangeNotification:body];
     }
 }
 
