@@ -66,5 +66,5 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.facebook.react:react-native:+'
-    api (name: 'ugee_pen', ext: 'aar')
+    api "com.ugee:ugeepen:1.0"
 }
