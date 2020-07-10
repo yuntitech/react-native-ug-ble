@@ -12,25 +12,33 @@ export const scanBluetoothDeviceNotification =
 export const connectDeviceTypeNotification = 'connectDeviceTypeNotification';
 
 export enum ConnectStatusType {
+  // public static final int STATE_DISCONNECTED = 0;
+  // public static final int STATE_CONNECTING = 1;
+  // public static final int STATE_CONNECTED = 2;
+  // public static final int STATE_ERROR = 3;
+  // public static final int STATE_ENTER_SYNC_MODE_SUCCESS = 4;
+  // public static final int STATE_ENTER_SYNC_MODE_FAIL = 5;
+  // public static final int STATE_DEVICE_INFO = 6;
+  // public static final int NO_DEVICE = 7;
   /**
    * 连接成功
    */
-  CONNECT_DEVICE_TYPE_SUCCESS = 0,
+  CONNECT_DEVICE_TYPE_SUCCESS = 6,
 
   /**
    * 连接失败
    */
-  CONNECT_DEVICE_TYPE_ONFAIL = 1,
+  CONNECT_DEVICE_TYPE_ONFAIL = 3,
 
   /**
    * 断开连接
    */
-  CONNECT_DEVICE_TYPE_DISCONNECT = 3,
+  CONNECT_DEVICE_TYPE_DISCONNECT = 0,
 
   /**
    * 设备地址为空
    */
-  CONNECT_DEVICE_TYPE_ADDRESS_NULL = 4,
+  CONNECT_DEVICE_TYPE_ADDRESS_NULL = 7,
 
   /**
    * 蓝牙未打开
