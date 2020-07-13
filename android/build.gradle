@@ -66,5 +66,5 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.facebook.react:react-native:+'
-    api "com.ugee:ugeepen:1.0"
+    api "com.ugee:ugeepen:1.1"
 }
